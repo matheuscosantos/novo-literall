@@ -5,20 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
 
-
+//Essa tela precisa ser Stateful para utilizar o geolocator de forma assíncrona
 class FormularioLivro extends StatefulWidget {
   @override
   _FormularioLivroState createState() => _FormularioLivroState();
 }
 
-
 class _FormularioLivroState extends State<FormularioLivro> {
 
   final _auth = FirebaseAuth.instance;
   dynamic usuario;
-  String emailUsuario;
   String telefoneUsuario;
-
+  String _emailUsuario;
+  String _nomeUsuario;
   String _cidade = "";
   String _estado = "";
 
@@ -26,6 +25,7 @@ class _FormularioLivroState extends State<FormularioLivro> {
   void initState(){
     super.initState();
     getCurrentLocation();
+    getCurrentUser();
   }
 
   getCurrentLocation() async {
@@ -39,12 +39,20 @@ class _FormularioLivroState extends State<FormularioLivro> {
     });
   }
 
+  getCurrentUser() async {
+    final usuario = await _auth.currentUser();
+    setState(() {
+      _emailUsuario = usuario.email;
+      _nomeUsuario = usuario.displayName;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-
     var snapshots = Firestore.instance
         .collection('livros')
         .where('excluido', isEqualTo: false)
+        .where('email', isEqualTo: _emailUsuario)
         .snapshots();
     return Scaffold(
       appBar: AppBar(
@@ -193,15 +201,13 @@ class _FormularioLivroState extends State<FormularioLivro> {
               FlatButton(
                   onPressed: () async{
 
-                    usuario = await _auth.currentUser();
-                    emailUsuario = usuario.email;
-
                     if(form.currentState.validate()){
                       await Firestore.instance.collection('livros').add({
                         'titulo':titulo.text,
                         'autor': autor.text,
                         'telefone': telefone.text,
-                        'email': emailUsuario,
+                        'email': _emailUsuario,
+                        'contato': _nomeUsuario,
                         'cidade': _cidade,
                         'estado': _estado,
                         'disponivel': true,
