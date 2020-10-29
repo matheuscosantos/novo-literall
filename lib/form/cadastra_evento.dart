@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
+import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
@@ -17,7 +19,7 @@ class _FormularioEventoState extends State<FormularioEvento> {
   dynamic usuario;
   String telefoneUsuario;
   String _emailUsuario;
-  String _nomeUsuario;
+  String _nomeUsuario;  
   String _cidade = "";
   String _estado = "";
 
@@ -122,17 +124,22 @@ class _FormularioEventoState extends State<FormularioEvento> {
     );
   }
 
+  
+
   Future modalCreate(BuildContext context) {
     var form = GlobalKey<FormState>();
 
     var nome = TextEditingController();
     var descricao = TextEditingController();
-    var data = TextEditingController();
-    var horario = TextEditingController();
+    //var data = TextEditingController();
+    //var horario = TextEditingController();
     var telefone = TextEditingController();
     var endereco = TextEditingController();
-    
 
+    var data = DateFormat("dd-MM-yyyy");
+    var horario = DateFormat("HH:mm");
+
+    
     return showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -147,9 +154,9 @@ class _FormularioEventoState extends State<FormularioEvento> {
                     TextFormField(
                       decoration: InputDecoration(
                         hintText: 'Nome do Evento',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        )
+                        //border: OutlineInputBorder(
+                          //borderRadius: BorderRadius.circular(10),
+                        //)
                       ),
                       controller: nome,
                       validator: (value){
@@ -164,9 +171,9 @@ class _FormularioEventoState extends State<FormularioEvento> {
                     TextFormField(
                       decoration: InputDecoration(
                           hintText: 'Descrição do evento',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          )
+                          //border: OutlineInputBorder(
+                            //borderRadius: BorderRadius.circular(10),
+                          //)
                       ),
                       controller: descricao,
                       validator: (value){
@@ -177,37 +184,27 @@ class _FormularioEventoState extends State<FormularioEvento> {
                       },
                     ),
 
-                    Text('Data'),
-                    TextFormField(
-                      decoration: InputDecoration(
-                          hintText: 'Data do evento',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          )
-                      ),
-                      controller: data,
-                      validator: (value){
-                        if(value.isEmpty){
-                          return 'Este campo não pode ser vazio';
-                        }
-                        return null;
+                    Text('Data (${data.pattern})'),
+                    DateTimeField(
+                      format: data,
+                      onShowPicker: (context, currentValue) {
+                      return showDatePicker(
+                          context: context,
+                          firstDate: DateTime(2020),
+                          initialDate: currentValue ?? DateTime.now(),
+                          lastDate: DateTime(2100));
                       },
                     ),
 
-                    Text('Horário'),
-                    TextFormField(
-                      decoration: InputDecoration(
-                          hintText: 'Horário do evento',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          )
-                      ),
-                      controller: horario,
-                      validator: (value){
-                        if(value.isEmpty){
-                          return 'Este campo não pode ser vazio';
-                        }
-                        return null;
+                    Text('Horário (${horario.pattern})'),
+                    DateTimeField(
+                      format: horario,
+                      onShowPicker: (context, currentValue) async {
+                        final time = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.fromDateTime(currentValue ?? DateTime.now()),
+                        );
+                        return DateTimeField.convert(time);
                       },
                     ),
 
@@ -215,9 +212,9 @@ class _FormularioEventoState extends State<FormularioEvento> {
                     TextFormField(
                       decoration: InputDecoration(
                           hintText: 'Telefone para contato',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          )
+                          //border: OutlineInputBorder(
+                            //borderRadius: BorderRadius.circular(10),
+                          //)
                       ),
                       controller: telefone,
                       validator: (value){
@@ -232,9 +229,9 @@ class _FormularioEventoState extends State<FormularioEvento> {
                     TextFormField(
                       decoration: InputDecoration(
                           hintText: 'Endereço do evento',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          )
+                          //border: OutlineInputBorder(
+                            //borderRadius: BorderRadius.circular(10),
+                         //)
                       ),
                       controller: endereco,
                       validator: (value){
@@ -265,8 +262,9 @@ class _FormularioEventoState extends State<FormularioEvento> {
                         'contato': _nomeUsuario,
                         'cidade': _cidade,
                         'estado': _estado,
+                        'horario': horario,
                         'disponivel': true,
-                        'data': Timestamp.now(),
+                        'data': data,
                         'excluido': false,
                       });
 
