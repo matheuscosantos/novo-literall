@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:login/form/busca_evento.dart';
+import 'package:login/form/cadastra_evento.dart';
 import 'form/busca_livro.dart';
 import 'form/cadastra_livro.dart';
 import 'inicio.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
   runApp(MyApp());
@@ -14,6 +17,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: [
+      GlobalWidgetsLocalizations.delegate,
+      GlobalMaterialLocalizations.delegate,
+    ],
+      supportedLocales: [Locale("pt", "BR")],
       title: '',
       theme: ThemeData(
         primarySwatch: Colors.green,
@@ -157,6 +165,8 @@ class WelcomeUserWidget extends StatelessWidget {
                     SizedBox(height: 20),
                     botaoCadastraLivro(context),
                     botaoBuscarLivro(context),
+                    botaoCadastraEvento(context),
+                    botaoBuscarEvento(context),
                     botaoLogout(context)
                   ],
                 ))));
@@ -205,9 +215,59 @@ class WelcomeUserWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                Icon(Icons.find_in_page_outlined, color: Colors.white),
+                Icon(Icons.find_in_page, color: Colors.white),
                 SizedBox(width: 10),
                 Text('Buscar Livros', style: TextStyle(color: Colors.white))
+              ],
+            )));
+  }
+
+  FlatButton botaoCadastraEvento(BuildContext context) {
+    return FlatButton(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => FormularioEvento()),
+          );
+        },
+        color: Colors.green[300],
+        child: Padding(
+            padding: EdgeInsets.all(10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Icon(Icons.event, color: Colors.white),
+                SizedBox(width: 10),
+                Text('Cadastrar Evento', style: TextStyle(color: Colors.white))
+              ],
+            )));
+  }
+
+  FlatButton botaoBuscarEvento(BuildContext context) {
+    return FlatButton(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => BuscaEvento()),
+          );
+        },
+        color: Colors.green[300],
+        child: Padding(
+            padding: EdgeInsets.all(10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Icon(Icons.find_in_page, color: Colors.white),
+                SizedBox(width: 10),
+                Text('Buscar Eventos', style: TextStyle(color: Colors.white))
               ],
             )));
   }

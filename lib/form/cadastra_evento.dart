@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
 
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+
 //Essa tela precisa ser Stateful para utilizar o geolocator de forma assíncrona
 class FormularioEvento extends StatefulWidget {
   @override
@@ -129,16 +131,18 @@ class _FormularioEventoState extends State<FormularioEvento> {
   Future modalCreate(BuildContext context) {
     var form = GlobalKey<FormState>();
 
+    var maskFormatData = new MaskTextInputFormatter(mask: '##-##-####', filter: { "#": RegExp(r'[0-9]') });
+    var maskFormatHorario = new MaskTextInputFormatter(mask: '##:##', filter: { "#": RegExp(r'[0-9]') });
+    var maskFormatTelefone = new MaskTextInputFormatter(mask: '+## (##) #####-####', filter: { "#": RegExp(r'[0-9]') });    
+
     var nome = TextEditingController();
     var descricao = TextEditingController();
-    //var data = TextEditingController();
-    //var horario = TextEditingController();
+    var data = TextEditingController();
+    var horario = TextEditingController();
     var telefone = TextEditingController();
     var endereco = TextEditingController();
 
-    var data = DateFormat("dd-MM-yyyy");
-    var horario = DateFormat("HH:mm");
-
+    
     
     return showDialog(
         context: context,
@@ -184,38 +188,53 @@ class _FormularioEventoState extends State<FormularioEvento> {
                       },
                     ),
 
-                    Text('Data (${data.pattern})'),
-                    DateTimeField(
-                      format: data,
-                      onShowPicker: (context, currentValue) {
-                      return showDatePicker(
-                          context: context,
-                          firstDate: DateTime(2020),
-                          initialDate: currentValue ?? DateTime.now(),
-                          lastDate: DateTime(2100));
-                      },
-                    ),
-
-                    Text('Horário (${horario.pattern})'),
-                    DateTimeField(
-                      format: horario,
-                      onShowPicker: (context, currentValue) async {
-                        final time = await showTimePicker(
-                          context: context,
-                          initialTime: TimeOfDay.fromDateTime(currentValue ?? DateTime.now()),
-                        );
-                        return DateTimeField.convert(time);
-                      },
-                    ),
-
-                    Text('Telefone'),
+                    Text('Data'),
                     TextFormField(
                       decoration: InputDecoration(
-                          hintText: 'Telefone para contato',
+                          hintText: 'xx-xx-xxxx',
                           //border: OutlineInputBorder(
                             //borderRadius: BorderRadius.circular(10),
                           //)
                       ),
+                      inputFormatters: [maskFormatData],
+                      controller: data,
+                      validator: (value){
+                        if(value.isEmpty){
+                          return 'Este campo não pode ser vazio';
+                        }
+                        return null;
+                      },
+                    ),
+
+
+                    Text('Horario'),
+                    TextFormField(
+                      decoration: InputDecoration(
+                          hintText: 'xx:xx',
+                          //border: OutlineInputBorder(
+                            //borderRadius: BorderRadius.circular(10),
+                          //)
+                      ),
+                      inputFormatters: [maskFormatHorario],
+                      controller: horario,
+                      validator: (value){
+                        if(value.isEmpty){
+                          return 'Este campo não pode ser vazio';
+                        }
+                        return null;
+                      },
+                    ),
+
+
+                    Text('Telefone'),
+                    TextFormField(
+                      decoration: InputDecoration(
+                          hintText: '+## (##) #####-####',
+                          //border: OutlineInputBorder(
+                            //borderRadius: BorderRadius.circular(10),
+                          //)
+                      ),
+                      inputFormatters: [maskFormatTelefone],
                       controller: telefone,
                       validator: (value){
                         if(value.isEmpty){
@@ -262,9 +281,9 @@ class _FormularioEventoState extends State<FormularioEvento> {
                         'contato': _nomeUsuario,
                         'cidade': _cidade,
                         'estado': _estado,
-                        'horario': horario,
+                        'horario': horario.text,
                         'disponivel': true,
-                        'data': data,
+                        'data': data.text,
                         'excluido': false,
                       });
 
